@@ -1,0 +1,13 @@
+{
+    "name": "latex",
+    "image": "ghcr.io/philippdrebes/latex:ubuntu",
+    "customizations": {
+        "vscode": {
+            "settings": {},
+            "extensions": [
+				"James-Yu.latex-workshop",
+				"bnavetta.zoterolatex"
+			]
+        }
+    }
+}

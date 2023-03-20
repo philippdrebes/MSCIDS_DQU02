@@ -1,0 +1,96 @@
+---
+title: 'Data Quality: Lecture 4'
+author: "Philipp Drebes"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require("naniar")) install.packages("naniar", dependencies=TRUE)
+if (!require("readxl")) install.packages("readxl", dependencies=TRUE)
+if (!require("mice")) install.packages("mice", dependencies=TRUE)
+```
+
+## Task 01
+### Missing pattern / Test whether MCAR is given
+
+A data set *riskfactors* is given.
+
+How does the missing pattern look like?
+
+Are the elements of the data set completely at random (MCAR)?
+
+Apply a MCAR test.
+
+#### Missing pattern
+```{r}
+library(naniar)
+library(mice)
+
+head(riskfactors)
+md.pattern(riskfactors)
+```
+#### MCAR Test
+```{r}
+mcar_test(riskfactors)
+```
+
+## Task 02
+### Missing analysis
+
+A data set *grades* is given.
+
+There are missings in the data set.
+
+Using R, analyze the missing structure.
+
+Apply single imputation for types "mean" and "sample" and compare them.
+
+With this setting you will get to know the two simplest methods of MICE.
+
+#### Missing pattern
+```{r}
+library(readxl)
+
+grades <- read_excel('data/grades.xlsx')
+head(grades)
+
+md.pattern(grades)
+
+mean(grades$TakeHome, na.rm = TRUE)
+mean(grades$Final, na.rm = TRUE)
+
+
+```
+
+#### Imputation
+```{r}
+
+imp_grades_mean <- mice(grades, method="mean", m=1, maxit=1)
+imp_grades_mean <- mice(grades, method="sample", m=1, maxit=1)
+
+grades_mean <- complete(imp_grades_mean)
+
+head(grades,10)
+head(grades_mean,10)
+
+mean(grades$TakeHome, na.rm = TRUE)
+mean(grades_mean$TakeHome, na.rm = TRUE)
+
+mean(grades$Final, na.rm = TRUE)
+mean(grades_mean$Final, na.rm = TRUE)
+```
+
+## Task 03
+### MCAR, MAR or MNAR?
+Develop your own examples of the emergence of the MCAR, MAR, and MNAR.
+
+#### MCAR
+
+#### MAR
+
+#### MNAR
+
