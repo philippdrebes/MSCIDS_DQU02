@@ -1,10 +1,10 @@
 ---
 title: 'Data Quality: Lecture 4'
 author: "Philipp Drebes"
-date: "`r Sys.Date()`"
+date: "`r format(Sys.Date(), format='%d.%m.%Y')`"
 output:
-  html_document:
-    df_print: paged
+  pdf_document: 
+    keep_tex: true
 ---
 
 ```{r setup, include=FALSE}
@@ -26,6 +26,8 @@ Are the elements of the data set completely at random (MCAR)?
 Apply a MCAR test.
 
 #### Missing pattern
+
+
 ```{r}
 library(naniar)
 library(mice)
@@ -33,10 +35,17 @@ library(mice)
 head(riskfactors)
 md.pattern(riskfactors)
 ```
+
 #### MCAR Test
+
 ```{r}
 mcar_test(riskfactors)
 ```
+
+##### Interpretation
+
+The null hypothesis in this test is that the data is MCAR.
+Given that the p-value of the MCAR test is below 0.05, we can conclude the *riskfactors* data is not missing completely at random.
 
 ## Task 02
 ### Missing analysis
@@ -51,7 +60,9 @@ Apply single imputation for types "mean" and "sample" and compare them.
 
 With this setting you will get to know the two simplest methods of MICE.
 
+
 #### Missing pattern
+
 ```{r}
 library(readxl)
 
@@ -59,38 +70,47 @@ grades <- read_excel('data/grades.xlsx')
 head(grades)
 
 md.pattern(grades)
-
-mean(grades$TakeHome, na.rm = TRUE)
-mean(grades$Final, na.rm = TRUE)
-
-
 ```
+
+
 
 #### Imputation
+
+
 ```{r}
+grades.imp.mean <- mice(grades, method="mean", m=1, maxit=1)
+grades.imp.sample <- mice(grades, method="sample", m=1, maxit=1)
 
-imp_grades_mean <- mice(grades, method="mean", m=1, maxit=1)
-imp_grades_mean <- mice(grades, method="sample", m=1, maxit=1)
+grades.mean <- complete(grades.imp.mean)
+grades.sample <- complete(grades.imp.sample)
 
-grades_mean <- complete(imp_grades_mean)
+cat('mean TakeHome before imputation: ', mean(grades$TakeHome, na.rm = TRUE))
+cat('mean TakeHome after imputation [mean]: ', mean(grades.mean$TakeHome, na.rm = TRUE))
+cat('mean TakeHome after imputation [sample]: ', mean(grades.sample$TakeHome, na.rm = TRUE))
 
-head(grades,10)
-head(grades_mean,10)
-
-mean(grades$TakeHome, na.rm = TRUE)
-mean(grades_mean$TakeHome, na.rm = TRUE)
-
-mean(grades$Final, na.rm = TRUE)
-mean(grades_mean$Final, na.rm = TRUE)
+cat('mean Final before imputation:', mean(grades$Final, na.rm = TRUE))
+cat('mean Final after imputation [mean]:', mean(grades.mean$Final, na.rm = TRUE))
+cat('mean Final after imputation [sample]:', mean(grades.sample$Final, na.rm = TRUE))
 ```
+
+
+```{r}
+head(grades.mean, n = 10)
+head(grades.sample, n = 10)
+```
+
+
 
 ## Task 03
 ### MCAR, MAR or MNAR?
 Develop your own examples of the emergence of the MCAR, MAR, and MNAR.
 
-#### MCAR
+#### MCAR (Missing Completely At Random)
+For example, when data are missing for respondents because of a server error on the system that was running the online survey tool.
 
-#### MAR
+#### MAR (Missing At Random)
+For example, only younger people have missing values for IQ. In that case the probability of missing data on IQ is related to age.
 
-#### MNAR
+#### MNAR (Missing Not At Random)
+For example, when data are missing on IQ and only the people with low IQ values have missing observations for this variable.
 

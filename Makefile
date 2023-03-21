@@ -18,6 +18,8 @@ NOTEBOOK_DOCKER_BUILD = docker compose --env-file ./$(ENV_FILE) build notebook
 
 RSTUDIO_DOCKER_START = docker compose up -d rstudio && docker compose logs -f rstudio
 
+# LATEX_DOCKER = docker run --rm -v $(pwd)/Lecture04:/data ghcr.io/philippdrebes/latex:ubuntu latexmk -pdf exercise04.tex
+
 # Include other definitions
 include *.mk
 ###########################
