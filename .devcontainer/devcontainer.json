@@ -3,7 +3,9 @@
     "image": "ghcr.io/philippdrebes/latex:ubuntu",
     "customizations": {
         "vscode": {
-            "settings": {},
+            "settings": {
+				"extensions.verifySignature": false
+			},
             "extensions": [
 				"James-Yu.latex-workshop",
 				"bnavetta.zoterolatex"

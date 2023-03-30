@@ -1,0 +1,106 @@
+---
+title: 'Data Quality: Lecture 5'
+author: "Philipp Drebes"
+date: "`r format(Sys.Date(), format='%d.%m.%Y')`"
+output:
+  pdf_document: 
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require("readxl")) install.packages("readxl", dependencies=TRUE)
+if (!require("outliers")) install.packages("outliers", dependencies=TRUE)
+if (!require("EnvStats")) install.packages("EnvStats", dependencies=TRUE)
+```
+
+## Task 01
+
+How does the outlier pattern look like? Show the characteristics of the data by using visualization technique.
+
+```{r}
+library(outliers)
+library(readxl)
+
+hse <- read_excel('data/HSE.xlsx')
+head(hse)
+```
+
+### Key figures & Graphs
+
+```{r}
+summary(hse)
+
+min(hse$wtval, na.rm = TRUE)
+max(hse$wtval, na.rm = TRUE)
+
+hse_data <- na.omit(hse)
+hist(hse_data$wtval, breaks = sqrt(nrow(hse_data)))
+```
+
+### Box plot
+
+```{r}
+boxplot(hse_data$wtval)
+out <- boxplot.stats(hse_data$wtval)$out
+length(out)
+```
+
+We see 199 outliers, of which 3 seem to be more extreme.
+
+```{r}
+out_ind <- which(hse_data$wtval %in% c(out))
+out_ind
+
+hse_data[out_ind, ]
+
+boxplot(hse_data$wtval)
+mtext(paste("Outliers: ", paste(out, collapse = ", ")))
+```
+
+### Percentiles method
+
+```{r}
+lower_bound <- quantile(hse_data$wtval, 0.025)
+lower_bound
+
+upper_bound <- quantile(hse_data$wtval, 0.975)
+upper_bound
+
+outlier_ind <- which(hse_data$wtval < lower_bound | hse_data$wtval > upper_bound)
+outlier_ind
+```
+
+## Task 02
+
+Perform an outlier test according to Grubbs. Also reflect on the hypothesis structure that goes with this test.
+
+Perform an outlier test according to Rosner.
+
+```{r}
+library(readxl)
+library(outliers)
+library(EnvStats, quietly = T)
+
+hse <- read_excel('data/HSE.xlsx')
+hse_data <- na.omit(hse)
+head(hse_data, 10)
+```
+
+### Grubbs
+
+```{r}
+grubbs.test(hse_data$wtval)
+grubbs.test(hse_data$wtval, opposite = TRUE)
+```
+
+We assume the data is normal distributed. Then the Grubbs test for one outlier indicates that there is strong evidence to suggest that the highest value of 184.3 is an outlier. There is no significant evidence to suggest that the lowest value of 35.6 is an outlier.
+
+### Rosner
+
+```{r}
+test.rosner <- rosnerTest(hse_data$wtval, k = 25)
+test.rosner$all.stats
+```
+
+We assume the data is normal distributed. Then for the RosnerTest the first 12 observations (which are the furthest away from the median) are indeed outliers. All values above 152.5 are outliers. Values below are marked as NON-outliers by this test.
