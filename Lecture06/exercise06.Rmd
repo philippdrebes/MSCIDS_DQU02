@@ -4,7 +4,8 @@ author: "Philipp Drebes"
 date: "`r format(Sys.Date(), format='%d.%m.%Y')`"
 output:
   pdf_document: 
-    keep_tex: true
+    keep_tex: yes
+    highlight: pygments
 ---
 
 ```{r setup, include=FALSE}
@@ -52,7 +53,6 @@ plot(data.scaled)
 ```{r}
 reps <- rep(0, 6)
 for (i in 1:6) reps[i] <- sum(kmeans(data.scaled, centers = i, nstart = 20)$withinss)
-par(mfrow = c(1,1))
 plot(1:6, reps, type = "b", xlab = "Number of groups", ylab = "Sum of squares")
 ```
 
