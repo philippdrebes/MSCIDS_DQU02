@@ -12,12 +12,39 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 if (!require("readxl")) install.packages("readxl", dependencies=TRUE)
 if (!require("dbscan")) install.packages("dbscan", dependencies=TRUE)
-if (!require("questionr")) install.packages("questionr", dependencies=TRUE)
 ```
 
 # Task 1
 
 The data set *learning* is given. Run the RANSAC algorithm to determine, whether there are outliers.
+
+```{r ransac}
+ransac <- function(data, n, k, t, d) {
+  iterations <- 0
+  bestfit <- NULL
+  besterr <- 1e5
+  while (iterations < k) {
+    maybeinliers <- sample(nrow(data), n)
+    maybemodel <- lm(y ~ x, data = data, subset = maybeinliers)
+    alsoinliers <- NULL
+    for (point in setdiff(1:nrow(data), maybeinliers)) {
+      if (abs(maybemodel$coefficients[2]*data[point, 1] - data[point, 2] +
+              maybemodel$coefficients[1])/(sqrt(maybemodel$coefficients[2] + 1)) < t)
+        alsoinliers <- c(alsoinliers, point)
+    }
+    if (length(alsoinliers) > d) {
+      bettermodel <- lm(y ~ x, data = data, subset = c(maybeinliers, alsoinliers))
+      thiserr <- summary(bettermodel)$sigma
+      if (thiserr < besterr) {
+        bestfit <- bettermodel
+        besterr <- thiserr
+      }
+    }
+    iterations <- iterations + 1
+  }
+  bestfit
+}
+```
 
 ```{r}
 library(readxl)
@@ -27,8 +54,13 @@ head(learning)
 plot(success ~ effort, data = learning)
 abline(lm(success ~ effort, data = learning))
 
+learning$x <- learning$effort 
+learning$y <- learning$success
+learning <- subset(learning, select = c(x, y))
+
 set.seed(998899)
 abline(ransac(learning, n = 10, k = 10, t = 0.5, d = 10), col = "blue")
+legend(x = 'topleft', legend = c('simple lm', 'ransac'), col = c('black', 'blue'), lwd = 2)
 ```
 
 # Task 2
@@ -40,9 +72,16 @@ Run the DBSCAN algorithm to determine, whether there are outliers.
 library(dbscan)
 
 kNNdistplot(learning,  k = 4)
+abline(h = 1.32, col = 'red', lwd = 1)
+```
 
-dbscanResult <- dbscan(learning, eps= 1.5, minPts=4)
+We will use $1.32$ as the size of the epsilon neighborhood, as the kNN-dist-plot curve has a steeper angle at that value.
+
+```{r}
+dbscanResult <- dbscan(learning, eps= 1.32, minPts=4)
 dbscanResult
 
-hullplot(learning, dbscanResult)
+hullplot(learning, dbscanResult, xlab = 'effort', ylab = 'success')
 ```
+
+We see one outlier in the lower left corner.
