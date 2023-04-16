@@ -1,0 +1,48 @@
+---
+title: 'Data Quality: Lecture 7'
+author: "Philipp Drebes"
+date: "`r format(Sys.Date(), format='%d.%m.%Y')`"
+output:
+  pdf_document: 
+    keep_tex: yes
+    highlight: pygments
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require("readxl")) install.packages("readxl", dependencies=TRUE)
+if (!require("dbscan")) install.packages("dbscan", dependencies=TRUE)
+if (!require("questionr")) install.packages("questionr", dependencies=TRUE)
+```
+
+# Task 1
+
+The data set *learning* is given. Run the RANSAC algorithm to determine, whether there are outliers.
+
+```{r}
+library(readxl)
+
+learning <- read_xlsx('data/learning.xlsx')
+head(learning)
+plot(success ~ effort, data = learning)
+abline(lm(success ~ effort, data = learning))
+
+set.seed(998899)
+abline(ransac(learning, n = 10, k = 10, t = 0.5, d = 10), col = "blue")
+```
+
+# Task 2
+
+The data set *learning* is given.\
+Run the DBSCAN algorithm to determine, whether there are outliers.
+
+```{r}
+library(dbscan)
+
+kNNdistplot(learning,  k = 4)
+
+dbscanResult <- dbscan(learning, eps= 1.5, minPts=4)
+dbscanResult
+
+hullplot(learning, dbscanResult)
+```
