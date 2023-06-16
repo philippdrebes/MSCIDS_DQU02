@@ -84,13 +84,13 @@ grades.imp.sample <- mice(grades, method="sample", m=1, maxit=1)
 grades.mean <- complete(grades.imp.mean)
 grades.sample <- complete(grades.imp.sample)
 
-cat('mean TakeHome before imputation: ', mean(grades$TakeHome, na.rm = TRUE))
-cat('mean TakeHome after imputation [mean]: ', mean(grades.mean$TakeHome, na.rm = TRUE))
-cat('mean TakeHome after imputation [sample]: ', mean(grades.sample$TakeHome, na.rm = TRUE))
+cat('\n\nmean TakeHome before imputation: ', mean(grades$TakeHome, na.rm = TRUE))
+cat('\nmean TakeHome after imputation [mean]: ', mean(grades.mean$TakeHome, na.rm = TRUE))
+cat('\nmean TakeHome after imputation [sample]: ', mean(grades.sample$TakeHome, na.rm = TRUE))
 
-cat('mean Final before imputation:', mean(grades$Final, na.rm = TRUE))
-cat('mean Final after imputation [mean]:', mean(grades.mean$Final, na.rm = TRUE))
-cat('mean Final after imputation [sample]:', mean(grades.sample$Final, na.rm = TRUE))
+cat('\n\nmean Final before imputation:', mean(grades$Final, na.rm = TRUE))
+cat('\nmean Final after imputation [mean]:', mean(grades.mean$Final, na.rm = TRUE))
+cat('\nmean Final after imputation [sample]:', mean(grades.sample$Final, na.rm = TRUE))
 ```
 
 

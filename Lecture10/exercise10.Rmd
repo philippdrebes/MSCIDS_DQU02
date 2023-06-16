@@ -1,0 +1,90 @@
+---
+title: 'Data Quality: Lecture 10'
+author: "Philipp Drebes"
+date: "`r format(Sys.Date(), format='%d.%m.%Y')`"
+output:
+  pdf_document: 
+    keep_tex: yes
+    highlight: pygments
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require("readxl")) install.packages("readxl", dependencies=TRUE)
+if (!require("DescTools")) install.packages("DescTools", dependencies=TRUE)
+```
+
+# Task 1
+
+A data set is given from Health Survey for England
+(ukdataservice.ac.uk). The variables are described in a codebook.
+
+Examine these variables in terms of normal distribution and outliers
+
+-   Age\
+    There are different defined variables available -- use the most
+    appropriate, e.g. in terms of scale level
+
+-   Income\
+    There are different defined variables available -- use the most
+    appropriate, e.g. in terms of scale level
+
+-   Body height
+
+-   Body weight
+
+-   BMI
+
+```{r}
+library(readxl)
+library(DescTools)
+
+data_hse <- read_excel("hse2016_eul_small.xlsx")
+head(data_hse, 10)
+
+qqnorm(data_hse$Age35g)
+qqline(data_hse$Age35g)
+hist(data_hse$Age35g)
+
+qqnorm(data_hse$srcin01d)
+qqline(data_hse$srcin01d)
+hist(data_hse$srcin01d)
+
+qqnorm(data_hse$Height)
+qqline(data_hse$Height)
+hist(data_hse$Height)
+
+qqnorm(data_hse$Weight)
+qqline(data_hse$Weight)
+hist(data_hse$Weight)
+
+qqnorm(data_hse$BMI)
+qqline(data_hse$BMI)
+hist(data_hse$BMI)
+```
+
+# Task 2
+
+```{r}
+numbers <- c(1000, 10000, 100000, 1000000)
+
+for (i in numbers) {
+  x <- rnorm(n = i)
+  
+  start_time <- Sys.time()
+  qqnorm(x)
+  qqline(x)
+  end_time <- Sys.time()
+  print(end_time - start_time)
+  
+  sprintf('QQ-PLot for %i data points\n', i)
+}
+
+```
+
+What is the relationship between sample size and runtime?
+
+The relationship is exponential.
